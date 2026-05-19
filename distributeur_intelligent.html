@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distributeur de Nourriture Intelligent — ISET Nabeul</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --border: rgba(255,255,255,0.08);
+  --text: #e6edf3;
+  --muted: #7d8590;
+  --accent: #2ea043;
+  --accent2: #1f6feb;
+  --accent3: #f78166;
+  --accent4: #d2a8ff;
+  --accent5: #ffa657;
+  --teal: #39d353;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* — grid overlay — */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(46,160,67,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(46,160,67,.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+main { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+
+/* ── HERO ── */
+.hero {
+  padding: 5rem 0 3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(46,160,67,.12);
+  border: 1px solid rgba(46,160,67,.3);
+  color: var(--accent);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 1.5rem;
+  letter-spacing: .06em;
+}
+
+.hero-tag::before { content: '●'; font-size: 8px; animation: blink 1.5s step-end infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.15;
+  letter-spacing: -.01em;
+  margin-bottom: 1.25rem;
+  max-width: 700px;
+}
+
+.hero h1 em { font-style: italic; color: var(--accent); }
+
+.hero-desc {
+  color: var(--muted);
+  font-size: 15px;
+  max-width: 560px;
+  margin-bottom: 2rem;
+  line-height: 1.75;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.meta-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.meta-chip svg { width: 15px; height: 15px; stroke: var(--accent); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+/* ── STATS ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 2.5rem 0;
+}
+
+.stat {
+  background: var(--surface);
+  padding: 1.5rem;
+  text-align: center;
+  transition: background .2s;
+}
+.stat:hover { background: var(--surface2); }
+.stat-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 4px;
+}
+.stat-label { font-size: 12px; color: var(--muted); }
+
+/* ── SECTIONS ── */
+.section { margin-top: 3.5rem; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.section-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  background: rgba(46,160,67,.1);
+  border: 1px solid rgba(46,160,67,.2);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: -.01em;
+}
+
+/* ── COMPONENT CARDS ── */
+.comp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.comp-card {
+  background: var(--surface);
+  padding: 1.25rem;
+  transition: background .2s;
+  position: relative;
+}
+.comp-card:hover { background: var(--surface2); }
+
+.comp-accent {
+  width: 32px;
+  height: 3px;
+  border-radius: 2px;
+  margin-bottom: .85rem;
+}
+
+.comp-card h3 {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: .4rem;
+  letter-spacing: .02em;
+}
+
+.comp-card p {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: .75rem;
+}
+
+.spec-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid;
+  letter-spacing: .03em;
+}
+
+/* ── FLOW ── */
+.flow-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  overflow-x: auto;
+}
+
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: 640px;
+}
+
+.flow-step {
+  flex: 1;
+  text-align: center;
+}
+
+.flow-dot {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto .6rem;
+  font-size: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.flow-step h4 { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+.flow-step p { font-size: 11px; color: var(--muted); }
+
+.flow-arrow {
+  flex: 0 0 40px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 18px;
+}
+
+/* ── RPi SECTION ── */
+.rpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+@media (max-width: 600px) { .rpi-grid { grid-template-columns: 1fr; } }
+
+.rpi-panel {
+  background: var(--surface);
+  padding: 1.5rem;
+}
+
+.rpi-panel h3 {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .4rem 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  font-size: 13px;
+}
+.spec-row:last-child { border-bottom: none; }
+.spec-key { color: var(--muted); }
+.spec-val { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); }
+
+.role-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: .55rem 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  font-size: 13px;
+}
+.role-item:last-child { border-bottom: none; }
+.role-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-top: 7px; flex-shrink: 0; }
+
+.lib-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 1rem; padding-top: .85rem; border-top: 1px solid var(--border); }
+.lib-chip {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  background: rgba(31,111,235,.12);
+  border: 1px solid rgba(31,111,235,.25);
+  color: #79c0ff;
+  padding: 3px 9px;
+  border-radius: 5px;
+}
+
+/* ── TESTS ── */
+.test-list { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+
+.test-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  transition: background .15s;
+}
+.test-item:last-child { border-bottom: none; }
+.test-item:hover { background: var(--surface2); }
+
+.test-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(46,160,67,.1);
+  border: 1px solid rgba(46,160,67,.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.test-info { flex: 1; }
+.test-info strong { font-size: 13.5px; font-weight: 500; display: block; }
+.test-info span { font-size: 12px; color: var(--muted); }
+.test-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  background: rgba(46,160,67,.1);
+  border: 1px solid rgba(46,160,67,.2);
+  color: var(--accent);
+  padding: 3px 9px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+/* ── EVOLUTION ── */
+.evo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.evo-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.1rem;
+  transition: border-color .2s, background .2s;
+}
+.evo-card:hover { background: var(--surface2); border-color: rgba(255,255,255,.15); }
+
+.evo-icon { font-size: 22px; margin-bottom: .6rem; }
+.evo-card h4 { font-size: 13px; font-weight: 500; margin-bottom: .3rem; }
+.evo-card p { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+/* ── CONCLUSION ── */
+.conclusion {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-top: 3.5rem;
+  border-left: 3px solid var(--accent);
+}
+
+.conclusion h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  margin-bottom: .75rem;
+}
+.conclusion p { color: var(--muted); font-size: 14px; line-height: 1.75; }
+
+/* ── FOOTER ── */
+footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+footer p { font-size: 12px; color: var(--muted); }
+.footer-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  background: rgba(46,160,67,.08);
+  border: 1px solid rgba(46,160,67,.2);
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+
+/* ── FADE IN ── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
+.hero, .stats-row, .section { animation: fadeUp .5s ease both; }
+.section:nth-child(2) { animation-delay: .05s; }
+.section:nth-child(3) { animation-delay: .1s; }
+.section:nth-child(4) { animation-delay: .15s; }
+.section:nth-child(5) { animation-delay: .2s; }
+</style>
+</head>
+<body>
+<main>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-tag">PROJET EMBARQUÉ · ISET NABEUL</div>
+    <h1>Distributeur de Nourriture<br><em>Intelligent</em> pour Animaux</h1>
+    <p class="hero-desc">
+      Système automatisé basé sur Arduino UNO et Raspberry Pi 3 — identification RFID, distribution précise par moteur pas à pas, supervision web en temps réel et gestion des alertes environnementales.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-chip">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Yasmine Merhebene &nbsp;·&nbsp; Mohamed Aziz Ferjeni &nbsp;·&nbsp; Mohamed Dhia Jdidi
+      </div>
+      <div class="meta-chip">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Année universitaire 2025 / 2026
+      </div>
+      <div class="meta-chip">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Encadrante : Mme Imen Challouf
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STATS ── -->
+  <div class="stats-row">
+    <div class="stat"><span class="stat-val">&lt; 1 s</span><span class="stat-label">Réponse RFID</span></div>
+    <div class="stat"><span class="stat-val">±3 mm</span><span class="stat-label">Précision HC-SR04</span></div>
+    <div class="stat"><span class="stat-val">200</span><span class="stat-label">Pas/tour NEMA 17</span></div>
+    <div class="stat"><span class="stat-val">5</span><span class="stat-label">Composants intégrés</span></div>
+    <div class="stat"><span class="stat-val">35°C</span><span class="stat-label">Seuil alerte T°</span></div>
+  </div>
+
+  <!-- ── COMPOSANTS ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>Composants Matériels</h2>
+    </div>
+    <div class="comp-grid">
+
+      <div class="comp-card">
+        <div class="comp-accent" style="background:var(--accent4)"></div>
+        <h3>Raspberry Pi 3</h3>
+        <p>Cerveau du système. Supervision globale, serveur web Flask, stockage et gestion des alertes.</p>
+        <div class="spec-tags">
+          <span class="tag" style="color:var(--accent4);border-color:rgba(210,168,255,.25);background:rgba(210,168,255,.08)">Quad-core 1.2 GHz</span>
+          <span class="tag" style="color:var(--accent4);border-color:rgba(210,168,255,.25);background:rgba(210,168,255,.08)">1 Go RAM</span>
+          <span class="tag" style="color:var(--accent4);border-color:rgba(210,168,255,.25);background:rgba(210,168,255,.08)">Wi-Fi + BT</span>
+          <span class="tag" style="color:var(--accent4);border-color:rgba(210,168,255,.25);background:rgba(210,168,255,.08)">40 GPIO</span>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <div class="comp-accent" style="background:var(--accent2)"></div>
+        <h3>Arduino UNO</h3>
+        <p>Gestion temps réel des capteurs, du module RFID et du moteur pas à pas NEMA 17.</p>
+        <div class="spec-tags">
+          <span class="tag" style="color:#79c0ff;border-color:rgba(121,192,255,.25);background:rgba(121,192,255,.08)">ATmega328P</span>
+          <span class="tag" style="color:#79c0ff;border-color:rgba(121,192,255,.25);background:rgba(121,192,255,.08)">16 MHz</span>
+          <span class="tag" style="color:#79c0ff;border-color:rgba(121,192,255,.25);background:rgba(121,192,255,.08)">14 E/S num.</span>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <div class="comp-accent" style="background:var(--accent)"></div>
+        <h3>RFID RC522</h3>
+        <p>Identification sans contact de chaque animal via un badge RFID unique (UID).</p>
+        <div class="spec-tags">
+          <span class="tag" style="color:var(--accent);border-color:rgba(46,160,67,.25);background:rgba(46,160,67,.08)">13.56 MHz</span>
+          <span class="tag" style="color:var(--accent);border-color:rgba(46,160,67,.25);background:rgba(46,160,67,.08)">2–5 cm</span>
+          <span class="tag" style="color:var(--accent);border-color:rgba(46,160,67,.25);background:rgba(46,160,67,.08)">SPI</span>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <div class="comp-accent" style="background:var(--accent5)"></div>
+        <h3>Moteur NEMA 17</h3>
+        <p>Distribution précise de la nourriture — ouverture/fermeture de la trappe par pas.</p>
+        <div class="spec-tags">
+          <span class="tag" style="color:var(--accent5);border-color:rgba(255,166,87,.25);background:rgba(255,166,87,.08)">200 pas/tour</span>
+          <span class="tag" style="color:var(--accent5);border-color:rgba(255,166,87,.25);background:rgba(255,166,87,.08)">1.8°/pas</span>
+          <span class="tag" style="color:var(--accent5);border-color:rgba(255,166,87,.25);background:rgba(255,166,87,.08)">Driver A4988</span>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <div class="comp-accent" style="background:var(--accent3)"></div>
+        <h3>DHT11</h3>
+        <p>Mesure la température (0–50°C) et l'humidité (20–90%). Déclenche une alerte au-delà de 35°C.</p>
+        <div class="spec-tags">
+          <span class="tag" style="color:var(--accent3);border-color:rgba(247,129,102,.25);background:rgba(247,129,102,.08)">Signal num.</span>
+          <span class="tag" style="color:var(--accent3);border-color:rgba(247,129,102,.25);background:rgba(247,129,102,.08)">3.3–5V</span>
+          <span class="tag" style="color:var(--accent3);border-color:rgba(247,129,102,.25);background:rgba(247,129,102,.08)">1 s réponse</span>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <div class="comp-accent" style="background:#58a6ff"></div>
+        <h3>HC-SR04</h3>
+        <p>Capteur ultrasons qui détecte le niveau du réservoir : Plein / Mi-plein / Vide.</p>
+        <div class="spec-tags">
+          <span class="tag" style="color:#58a6ff;border-color:rgba(88,166,255,.25);background:rgba(88,166,255,.08)">40 kHz</span>
+          <span class="tag" style="color:#58a6ff;border-color:rgba(88,166,255,.25);background:rgba(88,166,255,.08)">2–400 cm</span>
+          <span class="tag" style="color:#58a6ff;border-color:rgba(88,166,255,.25);background:rgba(88,166,255,.08)">±3 mm</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── FLUX ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>Flux de Fonctionnement</h2>
+    </div>
+    <div class="flow-container">
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-dot" style="border-color:rgba(46,160,67,.3);background:rgba(46,160,67,.08)">📡</div>
+          <h4>Lecture RFID</h4>
+          <p>Animal détecté<br>Badge lu par RC522</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-dot" style="border-color:rgba(121,192,255,.3);background:rgba(121,192,255,.08)">🔐</div>
+          <h4>Vérification</h4>
+          <p>Arduino compare<br>l'UID autorisé</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-dot" style="border-color:rgba(255,166,87,.3);background:rgba(255,166,87,.08)">⚙️</div>
+          <h4>Distribution</h4>
+          <p>NEMA 17 ouvre<br>la trappe (N pas)</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-dot" style="border-color:rgba(247,129,102,.3);background:rgba(247,129,102,.08)">🌡️</div>
+          <h4>Capteurs</h4>
+          <p>DHT11 + HC-SR04<br>mesurent l'état</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-dot" style="border-color:rgba(210,168,255,.3);background:rgba(210,168,255,.08)">💻</div>
+          <h4>Supervision</h4>
+          <p>Raspberry Pi stocke<br>et affiche tout</p>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:1.25rem;font-family:'DM Mono',monospace;">
+        Arduino → Raspberry Pi via liaison série USB (UART, 9600 bauds) · Format JSON : {"temp", "hum", "niveau", "animal"}
+      </p>
+    </div>
+  </section>
+
+  <!-- ── RASPBERRY PI ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>Raspberry Pi 3 — Cerveau du Système</h2>
+    </div>
+    <div class="rpi-grid">
+      <div class="rpi-panel">
+        <h3>Spécifications techniques</h3>
+        <div class="spec-row"><span class="spec-key">Processeur</span><span class="spec-val">ARM Cortex-A53 1.2 GHz × 4</span></div>
+        <div class="spec-row"><span class="spec-key">RAM</span><span class="spec-val">1 Go LPDDR2</span></div>
+        <div class="spec-row"><span class="spec-key">Connectivité</span><span class="spec-val">Wi-Fi 802.11n + Bluetooth 4.1</span></div>
+        <div class="spec-row"><span class="spec-key">GPIO</span><span class="spec-val">40 broches</span></div>
+        <div class="spec-row"><span class="spec-key">Ports USB</span><span class="spec-val">4 × USB 2.0</span></div>
+        <div class="spec-row"><span class="spec-key">Vidéo</span><span class="spec-val">HDMI + DSI</span></div>
+        <div class="spec-row"><span class="spec-key">Stockage</span><span class="spec-val">microSD</span></div>
+        <div class="spec-row"><span class="spec-key">Alimentation</span><span class="spec-val">5 V / 2.5 A micro-USB</span></div>
+        <div class="spec-row"><span class="spec-key">Système</span><span class="spec-val">Raspberry Pi OS (Debian)</span></div>
+        <div class="spec-row"><span class="spec-key">Langage</span><span class="spec-val">Python 3</span></div>
+        <div class="lib-chips">
+          <span class="lib-chip">Flask</span>
+          <span class="lib-chip">PySerial</span>
+          <span class="lib-chip">Jinja2</span>
+          <span class="lib-chip">Chart.js</span>
+        </div>
+      </div>
+      <div class="rpi-panel">
+        <h3>Rôles dans le système</h3>
+        <div class="role-item"><div class="role-dot"></div><span>Réception des données Arduino via UART (9600 bauds) — température, humidité, niveau du réservoir, UID RFID</span></div>
+        <div class="role-item"><div class="role-dot"></div><span>Traitement et stockage de l'historique complet des repas de chaque animal identifié par RFID</span></div>
+        <div class="role-item"><div class="role-dot"></div><span>Hébergement du serveur Flask (port 5000) — interface web accessible depuis tout le réseau Wi-Fi</span></div>
+        <div class="role-item"><div class="role-dot"></div><span>Génération d'alertes automatiques : réservoir vide (HC-SR04) et température &gt; 35°C (DHT11)</span></div>
+        <div class="role-item"><div class="role-dot"></div><span>Mise à jour temps réel sans rechargement de page via Server-Sent Events (SSE)</span></div>
+        <div class="role-item"><div class="role-dot"></div><span>API REST (/api/data) pour intégration avec d'autres services ou applications mobiles</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TESTS ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>Tests &amp; Résultats</h2>
+    </div>
+    <div class="test-list">
+      <div class="test-item">
+        <div class="test-icon">✓</div>
+        <div class="test-info">
+          <strong>Reconnaissance RFID (RC522 + Arduino UNO)</strong>
+          <span>Différenciation correcte des cartes autorisées / non autorisées — aucune erreur d'identification</span>
+        </div>
+        <span class="test-badge">&lt; 1 s · 2–5 cm</span>
+      </div>
+      <div class="test-item">
+        <div class="test-icon">✓</div>
+        <div class="test-info">
+          <strong>Détection niveau de nourriture (HC-SR04)</strong>
+          <span>3 états précis : Plein (&lt; 5 cm), Mi-plein (5–15 cm), Vide (&gt; 15 cm)</span>
+        </div>
+        <span class="test-badge">±3 mm</span>
+      </div>
+      <div class="test-item">
+        <div class="test-icon">✓</div>
+        <div class="test-info">
+          <strong>Mesure température &amp; humidité (DHT11)</strong>
+          <span>Mesures cohérentes et répétables — alerte déclenchée correctement si T° &gt; 35°C</span>
+        </div>
+        <span class="test-badge">0–50°C · 1 s</span>
+      </div>
+      <div class="test-item">
+        <div class="test-icon">✓</div>
+        <div class="test-info">
+          <strong>Distribution moteur NEMA 17 (driver A4988)</strong>
+          <span>Dosage précis et personnalisable par animal selon son poids et ses besoins</span>
+        </div>
+        <span class="test-badge">200 pas/tour</span>
+      </div>
+      <div class="test-item">
+        <div class="test-icon">✓</div>
+        <div class="test-info">
+          <strong>Interface web Flask + SSE (Raspberry Pi 3)</strong>
+          <span>Affichage temps réel (T°, humidité, niveau, historique) sans rechargement — accessible Wi-Fi</span>
+        </div>
+        <span class="test-badge">Port 5000</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ÉVOLUTION ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2>Perspectives d'Évolution</h2>
+    </div>
+    <div class="evo-grid">
+      <div class="evo-card">
+        <div class="evo-icon">📶</div>
+        <h4>Intégration IoT</h4>
+        <p>Surveillance et contrôle à distance via application mobile ou interface web connectée à Internet.</p>
+      </div>
+      <div class="evo-card">
+        <div class="evo-icon">🤖</div>
+        <h4>Intelligence Artificielle</h4>
+        <p>IA sur Raspberry Pi pour adapter automatiquement les portions selon le comportement et l'historique de l'animal.</p>
+      </div>
+      <div class="evo-card">
+        <div class="evo-icon">📡</div>
+        <h4>Extension Multi-zones</h4>
+        <p>Dupliquer le dispositif dans plusieurs zones avec supervision centralisée via Raspberry Pi.</p>
+      </div>
+      <div class="evo-card">
+        <div class="evo-icon">🌡️</div>
+        <h4>Capteurs de précision</h4>
+        <p>Remplacer le DHT11 par des capteurs plus précis pour une meilleure qualité des mesures environnementales.</p>
+      </div>
+      <div class="evo-card">
+        <div class="evo-icon">📱</div>
+        <h4>Interface avancée</h4>
+        <p>Écran LCD, notifications push, signaux lumineux et sonores pour une meilleure ergonomie du prototype.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CONCLUSION ── -->
+  <div class="conclusion">
+    <h2>Conclusion</h2>
+    <p>
+      Ce projet démontre qu'il est possible de concevoir un système embarqué autonome et précis à partir de composants accessibles. L'intégration de la carte Arduino UNO pour la gestion temps réel des capteurs, du Raspberry Pi 3 pour la supervision intelligente, du module RFID pour l'identification personnalisée et du moteur NEMA 17 pour la distribution contrôlée offre une solution pratique et évolutive pour l'automatisation de l'alimentation animale. Les tests ont confirmé la stabilité et la fiabilité du prototype, ouvrant la voie à des extensions vers l'IoT et l'intelligence artificielle.
+    </p>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <p>Institut Supérieur des Études Technologiques de Nabeul &nbsp;·&nbsp; Encadrante : Mme Imen Challouf</p>
+    <span class="footer-tag">2025 / 2026</span>
+  </footer>
+
+</main>
+</body>
+</html>
